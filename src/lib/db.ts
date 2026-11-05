@@ -16,8 +16,7 @@ export async function initDb(): Promise<void> {
       authToken: authToken || undefined,
     });
 
-    await client.execute(`
-      CREATE TABLE IF NOT EXISTS projects (
+    await client.execute(`CREATE TABLE IF NOT EXISTS projects (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
         category TEXT NOT NULL,
@@ -28,39 +27,39 @@ export async function initDb(): Promise<void> {
         github_url TEXT,
         featured INTEGER DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-      CREATE TABLE IF NOT EXISTS skill_categories (
+      );`);
+    await client.execute(`CREATE TABLE IF NOT EXISTS skill_categories (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         icon TEXT DEFAULT "Code",
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-      CREATE TABLE IF NOT EXISTS skills (
+      );`);
+    await client.execute(`CREATE TABLE IF NOT EXISTS skills (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         category_id INTEGER NOT NULL,
         name TEXT NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (category_id) REFERENCES skill_categories(id) ON DELETE CASCADE
-      );
-      CREATE TABLE IF NOT EXISTS experiences (
+      );`);
+    await client.execute(`CREATE TABLE IF NOT EXISTS experiences (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        role TEXT NOT NULL, 
+        role TEXT NOT NULL,
         company TEXT NOT NULL,
         period TEXT NOT NULL,
         location TEXT,
         description TEXT,
         tech TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-      CREATE TABLE IF NOT EXISTS experience_achievements (
+      );`);
+    await client.execute(`CREATE TABLE IF NOT EXISTS experience_achievements (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         experience_id INTEGER NOT NULL,
         achievement TEXT NOT NULL,
         sort_order INTEGER DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (experience_id) REFERENCES experiences(id) ON DELETE CASCADE
-      );
-      CREATE TABLE IF NOT EXISTS education (
+      );`);
+    await client.execute(`CREATE TABLE IF NOT EXISTS education (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         degree TEXT NOT NULL,
         institution TEXT NOT NULL,
@@ -69,21 +68,20 @@ export async function initDb(): Promise<void> {
         description TEXT,
         tech TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-      CREATE TABLE IF NOT EXISTS education_achievements (
+      );`);
+    await client.execute(`CREATE TABLE IF NOT EXISTS education_achievements (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         education_id INTEGER NOT NULL,
         achievement TEXT NOT NULL,
         sort_order INTEGER DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (education_id) REFERENCES education(id) ON DELETE CASCADE
-      );
-      CREATE TABLE IF NOT EXISTS portfolio_settings (
+      );`);
+    await client.execute(`CREATE TABLE IF NOT EXISTS portfolio_settings (
         id INTEGER PRIMARY KEY DEFAULT 1,
         avatar_url TEXT DEFAULT "/avatar.svg",
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
+      );`);
 
     const projectCount = (await queryOne(client, "SELECT COUNT(*) as count FROM projects"))?.count;
     if (projectCount === 0) { await seedProjects(client); }
