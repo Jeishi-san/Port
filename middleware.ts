@@ -3,11 +3,14 @@ import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const isApiRoute = request.nextUrl.pathname.startsWith("/api/");
-  const auth = request.headers.get("authorization");
-  const expected = `Bearer ${process.env.ADMIN_PASSWORD}`;
+  const isMutation = ["POST", "PUT", "PATCH", "DELETE"].includes(request.method);
 
-  if (isApiRoute && auth !== expected) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (isApiRoute && isMutation) {
+    const auth = request.headers.get("authorization");
+    const expected = `Bearer ${process.env.ADMIN_PASSWORD}`;
+    if (auth !== expected) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
   }
 
   return NextResponse.next();

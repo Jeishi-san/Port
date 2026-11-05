@@ -44,7 +44,7 @@ export async function initDb(): Promise<void> {
       );
       CREATE TABLE IF NOT EXISTS experiences (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        role TEXT NOT NULL,
+        role TEXT NOT NULL, 
         company TEXT NOT NULL,
         period TEXT NOT NULL,
         location TEXT,
