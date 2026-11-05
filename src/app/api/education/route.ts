@@ -6,10 +6,10 @@ export async function GET() {
   try {
     await initDb();
     const db = getDb();
-    const rows = queryAll(db, "SELECT * FROM education ORDER BY created_at DESC");
+    const rows = await queryAll(db, "SELECT * FROM education ORDER BY created_at DESC");
     for (const row of rows) {
       row.tech = JSON.parse(row.tech || "[]");
-      row.achievements = queryAll(db, "SELECT achievement FROM education_achievements WHERE education_id = ? ORDER BY sort_order", [row.id]).map((a: any) => a.achievement);
+      row.achievements = (await queryAll(db, "SELECT achievement FROM education_achievements WHERE education_id = ? ORDER BY sort_order", [row.id])).map((a: any) => a.achievement);
     }
     return NextResponse.json(rows);
   } catch (e: any) {
@@ -22,16 +22,14 @@ export async function POST(request: Request) {
     await initDb();
     const db = getDb();
     const body = await request.json();
-    runStmt(db, "INSERT INTO education (degree, institution, period, location, description, tech) VALUES (?, ?, ?, ?, ?, ?)", [body.degree, body.institution, body.period, body.location, body.description, JSON.stringify(body.tech || [])]);
-    const eduId = lastInsertId(db);
+    await runStmt(db, "INSERT INTO education (degree, institution, period, location, description, tech) VALUES (?, ?, ?, ?, ?, ?)", [body.degree, body.institution, body.period, body.location, body.description, JSON.stringify(body.tech || [])]);
+    const eduId = await lastInsertId(db);
     if (body.achievements) {
-      body.achievements.forEach((ach: string, i: number) => {
-        runStmt(db, "INSERT INTO education_achievements (education_id, achievement, sort_order) VALUES (?, ?, ?)", [eduId, ach, i]);
-      });
+      for (const [i, ach] of body.achievements.entries()) {
+        await runStmt(db, "INSERT INTO education_achievements (education_id, achievement, sort_order) VALUES (?, ?, ?)", [eduId, ach, i]);
+      }
     }
-    const newRow = queryOne(db, "SELECT * FROM education WHERE id = ?", [eduId]);
-    newRow.tech = JSON.parse(newRow.tech || "[]");
-    newRow.achievements = body.achievements || [];
+    const newRow = await queryOne(db, "SELECT * FROM education WHERE id = ?", [eduId]);
     saveDb();
     return NextResponse.json(newRow, { status: 201 });
   } catch (e: any) {

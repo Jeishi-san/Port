@@ -6,7 +6,7 @@ export async function GET() {
   try {
     await initDb();
     const db = getDb();
-    const rows = queryAll(db, "SELECT * FROM projects ORDER BY created_at DESC");
+    const rows = await queryAll(db, "SELECT * FROM projects ORDER BY created_at DESC");
     return NextResponse.json(rows);
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
@@ -22,9 +22,9 @@ export async function POST(request: Request) {
     const placeholders = Object.keys(body).map(() => "?").join(", ");
     const values = Object.values(body);
     const sql = "INSERT INTO projects (" + columns + ") VALUES (" + placeholders + ")";
-    runStmt(db, sql, values);
-    const newId = lastInsertId(db);
-    const newRow = queryOne(db, "SELECT * FROM projects WHERE id = ?", [newId]);
+    await runStmt(db, sql, values);
+    const newId = await lastInsertId(db);
+    const newRow = await queryOne(db, "SELECT * FROM projects WHERE id = ?", [newId]);
     saveDb();
     return NextResponse.json(newRow, { status: 201 });
   } catch (e: any) {

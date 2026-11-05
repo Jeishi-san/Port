@@ -7,12 +7,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const { id } = await params;
     await initDb();
     const db = getDb();
-    const row = queryOne(db, "SELECT * FROM experiences WHERE id = ?", [id]);
+    const row = await queryOne(db, "SELECT * FROM experiences WHERE id = ?", [id]);
     if (!row) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
     row.tech = JSON.parse(row.tech || "[]");
-    row.achievements = queryAll(db, "SELECT achievement FROM experience_achievements WHERE experience_id = ? ORDER BY sort_order", [id]).map((a: any) => a.achievement);
+    row.achievements = (await queryAll(db, "SELECT achievement FROM experience_achievements WHERE experience_id = ? ORDER BY sort_order", [id])).map((a: any) => a.achievement);
     return NextResponse.json(row);
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
@@ -25,16 +25,14 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     await initDb();
     const db = getDb();
     const body = await request.json();
-    runStmt(db, "UPDATE experiences SET role = ?, company = ?, period = ?, location = ?, description = ?, tech = ? WHERE id = ?", [body.role, body.company, body.period, body.location, body.description, JSON.stringify(body.tech || []), id]);
-    runStmt(db, "DELETE FROM experience_achievements WHERE experience_id = ?", [id]);
+    await runStmt(db, "UPDATE experiences SET role = ?, company = ?, period = ?, location = ?, description = ?, tech = ? WHERE id = ?", [body.role, body.company, body.period, body.location, body.description, JSON.stringify(body.tech || []), id]);
+    await runStmt(db, "DELETE FROM experience_achievements WHERE experience_id = ?", [id]);
     if (body.achievements) {
-      body.achievements.forEach((ach: string, i: number) => {
-        runStmt(db, "INSERT INTO experience_achievements (experience_id, achievement, sort_order) VALUES (?, ?, ?)", [id, ach, i]);
-      });
+      for (const [i, ach] of body.achievements.entries()) {
+        await runStmt(db, "INSERT INTO experience_achievements (experience_id, achievement, sort_order) VALUES (?, ?, ?)", [id, ach, i]);
+      }
     }
-    const updated = queryOne(db, "SELECT * FROM experiences WHERE id = ?", [id]);
-    updated.tech = JSON.parse(updated.tech || "[]");
-    updated.achievements = body.achievements || [];
+    const updated = await queryOne(db, "SELECT * FROM experiences WHERE id = ?", [id]);
     saveDb();
     return NextResponse.json(updated);
   } catch (e: any) {
@@ -47,7 +45,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     const { id } = await params;
     await initDb();
     const db = getDb();
-    runStmt(db, "DELETE FROM experiences WHERE id = ?", [id]);
+    await runStmt(db, "DELETE FROM experiences WHERE id = ?", [id]);
     saveDb();
     return NextResponse.json({ success: true });
   } catch (e: any) {

@@ -7,7 +7,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const { id } = await params;
     await initDb();
     const db = getDb();
-    const row = queryOne(db, "SELECT * FROM projects WHERE id = ?", [id]);
+    const row = await queryOne(db, "SELECT * FROM projects WHERE id = ?", [id]);
     if (!row) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
@@ -25,8 +25,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const body = await request.json();
     const setClause = Object.keys(body).map((k) => k + " = ?").join(", ");
     const values = [...Object.values(body), id];
-    runStmt(db, "UPDATE projects SET " + setClause + " WHERE id = ?", values);
-    const updated = queryOne(db, "SELECT * FROM projects WHERE id = ?", [id]);
+    await runStmt(db, "UPDATE projects SET " + setClause + " WHERE id = ?", values);
+    const updated = await queryOne(db, "SELECT * FROM projects WHERE id = ?", [id]);
     saveDb();
     return NextResponse.json(updated);
   } catch (e: any) {
@@ -39,7 +39,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     const { id } = await params;
     await initDb();
     const db = getDb();
-    runStmt(db, "DELETE FROM projects WHERE id = ?", [id]);
+    await runStmt(db, "DELETE FROM projects WHERE id = ?", [id]);
     saveDb();
     return NextResponse.json({ success: true });
   } catch (e: any) {

@@ -9,13 +9,13 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const db = getDb();
     const body = await request.json();
     if (body.type === "category") {
-      runStmt(db, "UPDATE skill_categories SET name = ?, icon = ? WHERE id = ?", [body.name, body.icon, id]);
-      const updated = queryOne(db, "SELECT * FROM skill_categories WHERE id = ?", [id]);
+      await runStmt(db, "UPDATE skill_categories SET name = ?, icon = ? WHERE id = ?", [body.name, body.icon, id]);
+      const updated = await queryOne(db, "SELECT * FROM skill_categories WHERE id = ?", [id]);
       saveDb();
       return NextResponse.json(updated);
     } else {
-      runStmt(db, "UPDATE skills SET name = ? WHERE id = ?", [body.name, id]);
-      const updated = queryOne(db, "SELECT * FROM skills WHERE id = ?", [id]);
+      await runStmt(db, "UPDATE skills SET name = ? WHERE id = ?", [body.name, id]);
+      const updated = await queryOne(db, "SELECT * FROM skills WHERE id = ?", [id]);
       saveDb();
       return NextResponse.json(updated);
     }
@@ -31,9 +31,9 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     const db = getDb();
     const type = request.headers.get("x-type") || "skill";
     if (type === "category") {
-      runStmt(db, "DELETE FROM skill_categories WHERE id = ?", [id]);
+      await runStmt(db, "DELETE FROM skill_categories WHERE id = ?", [id]);
     } else {
-      runStmt(db, "DELETE FROM skills WHERE id = ?", [id]);
+      await runStmt(db, "DELETE FROM skills WHERE id = ?", [id]);
     }
     saveDb();
     return NextResponse.json({ success: true });
