@@ -7,9 +7,6 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-const STORAGE_KEY = "admin_auth";
-const STORAGE_PASSWORD_KEY = "admin_password";
-
 type Project = {
   id: number;
   title: string;
@@ -92,31 +89,56 @@ export default function AdminPage() {
   } | null>(null);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem(STORAGE_KEY);
-    const storedPassword = sessionStorage.getItem(STORAGE_PASSWORD_KEY);
-    if (stored === "true" && storedPassword) {
-      setAuthenticated(true);
-      setPassword(storedPassword);
+    let mounted = true;
+    async function checkAuth() {
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok && mounted) {
+          setAuthenticated(true);
+          fetchAll();
+        } else if (mounted) {
+          setAuthenticated(false);
+        }
+      } catch {
+        if (mounted) setAuthenticated(false);
+      }
     }
+    checkAuth();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!password) {
       setErrorMessage("Please enter a password");
       return;
     }
-    setAuthenticated(true);
-    sessionStorage.setItem(STORAGE_KEY, "true");
-    sessionStorage.setItem(STORAGE_PASSWORD_KEY, password);
-    setErrorMessage("");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      if (!res.ok) {
+        setErrorMessage("Invalid password");
+        return;
+      }
+      setAuthenticated(true);
+      setErrorMessage("");
+    } catch {
+      setErrorMessage("Login failed");
+    }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {}
     setAuthenticated(false);
     setPassword("");
-    sessionStorage.removeItem(STORAGE_KEY);
-    sessionStorage.removeItem(STORAGE_PASSWORD_KEY);
+    setErrorMessage("");
   };
 
   // All hooks must be called before any conditional return
