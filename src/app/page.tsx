@@ -22,6 +22,8 @@ import {
   Briefcase,
   GraduationCap,
   Code,
+  Download,
+  Phone,
 } from "lucide-react";
 import { GithubIcon, LinkedinIcon, TwitterIcon } from "@/components/icons";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -91,7 +93,7 @@ export default function PortfolioPage() {
   const [education, setEducation] = useState<Education[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const emailAddress = "alex.morgan@example.com";
+  const emailAddress = "pasaportejohnchristian@gmail.com";
 
   const filteredProjects =
     activeCategory === "All"
@@ -189,11 +191,11 @@ export default function PortfolioPage() {
             className="group flex items-center gap-2 font-semibold tracking-tight transition-opacity hover:opacity-85"
           >
             <div className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground font-mono font-bold text-sm shadow-xs transition-transform group-hover:scale-105 bg-glow">
-              <Image src={avatarUrl} alt="Alex Morgan avatar" width={36} height={36} className="size-6 rounded-full" />
+              <Image src={avatarUrl} alt="John Christian Pasaporte avatar" width={36} height={36} className="size-6 rounded-full" />
             </div>
             <div className="flex flex-col">
-              <span className="text-base font-semibold leading-tight">Alex Morgan</span>
-              <span className="text-[12px] text-muted-foreground leading-tight">Computer Science Graduate</span>
+              <span className="text-base font-semibold leading-tight">John Christian Pasaporte</span>
+              <span className="text-[12px] text-muted-foreground leading-tight">Information Security Specialist</span>
             </div>
           </a>
 
@@ -222,6 +224,10 @@ export default function PortfolioPage() {
                 </>
               )}
             </Button>
+            <a href="/resume.pdf" target="_blank" rel="noreferrer" className={buttonVariants({ variant: "outline", size: "sm", className: "gap-2 cursor-pointer" })}>
+              <Download className="size-3.5" />
+              <span className="text-xs">Resume</span>
+            </a>
             <a href="#contact" className={buttonVariants({ size: "sm" })}>Hire Me</a>
           </div>
 
@@ -247,6 +253,10 @@ export default function PortfolioPage() {
                 <Button variant="outline" size="sm" onClick={handleCopyEmail} className="w-full justify-center">
                   {copied ? "Email Copied!" : "Copy Email"}
                 </Button>
+                <a href="/resume.pdf" target="_blank" rel="noreferrer" className={buttonVariants({ variant: "outline", size: "sm", className: "w-full justify-center gap-2 cursor-pointer" })}>
+                  <Download className="size-3.5" />
+                  <span>Resume</span>
+                </a>
                 <a href="#contact" onClick={() => setMobileMenuOpen(false)} className={buttonVariants({ size: "sm", className: "w-full justify-center" })}>Hire Me</a>
               </div>
             </nav>
@@ -270,34 +280,36 @@ export default function PortfolioPage() {
             </h1>
 
             <p className="text-xl text-muted-foreground sm:text-2xl leading-relaxed">
-              I&apos;m <span className="font-semibold text-foreground">Alex Morgan</span>, a recent Computer Science
-              graduate passionate about building accessible, performant web applications. I enjoy learning new
-              technologies and turning ideas into working software.
+              I&apos;m <span className="font-semibold text-foreground">John Christian Pasaporte</span>, a BSIT
+              graduate majoring in Information Security with hands-on experience supporting enterprise
+              infrastructure and end users. I combine practical technical troubleshooting with a security-first
+              approach to maintain high system availability and ensure data integrity across organizational
+              workflows.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <a href="#projects" className={buttonVariants({ size: "lg", className: "gap-2 shadow-xs cursor-pointer" })}>
                 View Projects <ChevronRight className="size-4" />
               </a>
+              <a href="/resume.pdf" target="_blank" rel="noreferrer" className={buttonVariants({ variant: "outline", size: "lg", className: "gap-2 cursor-pointer" })}>
+                <Download className="size-4" /> View Resume
+              </a>
               <a href="#contact" className={buttonVariants({ variant: "outline", size: "lg", className: "gap-2 cursor-pointer" })}>
                 <Mail className="size-4" /> Get in Touch
               </a>
               <Button variant="ghost" size="lg" onClick={handleCopyEmail} className="gap-2 text-muted-foreground hover:text-foreground">
                 {copied ? <Check className="size-4 text-emerald-500" /> : <Copy className="size-4" />}
-                <span>{copied ? "Copied address" : "alex.morgan@example.com"}</span>
+                <span>{copied ? "Copied address" : "pasaportejohnchristian@gmail.com"}</span>
               </Button>
             </div>
 
             <div className="flex items-center gap-4 pt-4 text-muted-foreground">
               <span className="text-sm uppercase tracking-wider text-muted-foreground font-semibold">Connect:</span>
-              <a href="https://github.com" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground p-1" aria-label="GitHub Profile">
+              <a href="https://github.com/Jeishi-san" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground p-1" aria-label="GitHub Profile">
                 <GithubIcon className="size-5" />
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground p-1" aria-label="LinkedIn Profile">
+              <a href="https://linkedin.com/in/john-christian-pasaporte26" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground p-1" aria-label="LinkedIn Profile">
                 <LinkedinIcon className="size-5" />
-              </a>
-              <a href="https://twitter.com" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground p-1" aria-label="Twitter Profile">
-                <TwitterIcon className="size-5" />
               </a>
             </div>
 
@@ -628,15 +640,25 @@ export default function PortfolioPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <div className="flex size-9 items-center justify-center rounded-lg bg-muted border border-border">
-                    <Globe className="size-4 text-foreground" />
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-9 items-center justify-center rounded-lg bg-muted border border-border">
+                      <Globe className="size-4 text-foreground" />
+                    </div>
+                    <div>
+                      <div className="text-sm text-muted-foreground">Location &amp; Availability</div>
+                      <div className="text-base font-medium">Panabo City, Davao del Norte, Philippines</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground">Location &amp; Availability</div>
-                    <div className="text-base font-medium">San Francisco, CA - Open to remote worldwide</div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-9 items-center justify-center rounded-lg bg-muted border border-border">
+                      <Phone className="size-4 text-foreground" />
+                    </div>
+                    <div>
+                      <div className="text-sm text-muted-foreground">Phone</div>
+                      <div className="text-base font-medium">(+63) 991-887-7321</div>
+                    </div>
                   </div>
-                </div>
               </div>
             </div>
 
@@ -713,7 +735,7 @@ export default function PortfolioPage() {
       <footer className="border-t border-border/60 bg-muted/20 py-8 text-center text-sm text-muted-foreground">
         <div className="mx-auto max-w-6xl px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-foreground">Alex Morgan</span>
+            <span className="font-semibold text-foreground">John Christian Pasaporte</span>
             <span>- 2026</span>
             <span>-</span>
             <span>All rights reserved.</span>

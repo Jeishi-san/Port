@@ -131,12 +131,8 @@ export async function lastInsertId(db: any): Promise<number> {
 
 async function seedProjects(db: any) {
   const projects = [
-    ["TaskFlow", "Full Stack", "A task management application that helps users organize daily tasks, set priorities, and track progress with drag-and-drop functionality.", "100+ tasks managed", JSON.stringify(["React", "Node.js", "PostgreSQL", "Tailwind CSS"]), "https://taskflow-demo.example.com", "https://github.com/example/taskflow", 1],
-    ["WeatherWise", "Frontend", "A responsive weather dashboard that displays real-time weather conditions and 7-day forecasts using the OpenWeatherMap API.", "5 cities tracked", JSON.stringify(["React", "TypeScript", "Tailwind CSS", "REST API"]), "https://weatherwise-demo.example.com", "https://github.com/example/weatherwise", 1],
-    ["StudyHub", "Full Stack", "A student collaboration platform for sharing study materials, forming study groups, and tracking assignment deadlines.", "50+ users", JSON.stringify(["Next.js", "Tailwind CSS", "Firebase", "JavaScript"]), "https://studyhub-demo.example.com", "https://github.com/example/studyhub", 1],
-    ["CodeSnippet", "Frontend", "A personal code snippet manager for saving, categorizing, and quickly retrieving reusable code blocks across projects.", "200+ snippets", JSON.stringify(["React", "Tailwind CSS", "localStorage", "JavaScript"]), "https://codesnippet-demo.example.com", "https://github.com/example/codesnippet", 0],
-    ["BudgetTracker", "Backend", "A personal finance application that tracks income and expenses, generates monthly spending reports, and sets budget goals.", "$10k+ tracked", JSON.stringify(["Python", "Flask", "SQLite", "HTML/CSS"]), "https://budgettracker-demo.example.com", "https://github.com/example/budgettracker", 0],
-    ["Personal Portfolio", "Frontend", "This portfolio website built with Next.js 16, Tailwind CSS v4, and shadcn/ui, featuring dark mode support and responsive design.", "1 site built", JSON.stringify(["Next.js", "TypeScript", "Tailwind CSS", "shadcn/ui"]), "https://alexmorgan.dev", "https://github.com/example/portfolio", 0],
+    ["StegoLock", "Full Stack", "Secure digital document storage platform built with Laravel (PHP), MySQL, and React, incorporating zero-trust and Reconstruction-Dependent Security Model (RDSM) principles. Features access-controlled RESTful API endpoints and structured database schemas for document partitioning, verification, and protected storage.", "3rd Place Best Paper", JSON.stringify(["Laravel", "MySQL", "React", "Zero-Trust", "PHP", "REST API"]), "", "", 1],
+    ["Queuing Management System", "Full Stack", "Full-stack digital queuing system to automate customer intake workflows, track service timestamps, and reduce physical counter congestion. Engineered MySQL database schemas to record agent status, transaction durations, and queue performance metrics.", "2024", JSON.stringify(["MySQL", "Full-Stack", "PHP", "Queue Management"]), "", "", 0],
   ];
 
   for (const p of projects) {
@@ -146,9 +142,10 @@ async function seedProjects(db: any) {
 
 async function seedSkills(db: any) {
   const categories = [
-    ["Frontend Development", "Code", ["HTML5", "CSS3", "JavaScript (ES6+)", "TypeScript", "React", "Tailwind CSS", "shadcn/ui", "Git & GitHub"]],
-    ["Backend Development", "Database", ["Node.js", "Express", "Python", "REST APIs", "SQLite", "PostgreSQL", "Firebase"]],
-    ["Tools & Practices", "Cpu", ["VS Code", "Postman", "Figma", "Responsive Design", "Web Accessibility", "Agile Fundamentals", "Testing Basics"]],
+    ["ICT Infrastructure & Systems", "Cpu", ["Workstation Provisioning & Imaging (Rufus)", "Windows 10/11 Deployment", "Hardware Diagnostics & Assembly", "IT Asset Auditing & Inventory Tracking"]],
+    ["Network Administration", "Wifi", ["Structured Cabling (Cat5e/Cat6 Termination, RJ-45)", "Cable Continuity Testing", "Local Area Network (LAN) Troubleshooting", "Basic TCP/IP Configuration"]],
+    ["Access Control & Operations", "Shield", ["User Account Management", "Password Resets", "File/Share Permissions", "Helpdesk & Ticketing Support"]],
+    ["Software & Security Systems", "Code", ["Zero-Trust Architecture Principles", "Database Administration (MySQL)", "Web Application Development (Laravel, React, NextJS)", "Version Control (Git and Github)"]],
   ];
 
   for (const [name, icon, skills] of categories) {
@@ -162,8 +159,7 @@ async function seedSkills(db: any) {
 
 async function seedExperience(db: any) {
   const experiences = [
-    ["Software Engineering Intern", "TechStart Solutions", "Summer 2025", "Remote", "Assisted in building customer-facing features for a SaaS dashboard, wrote unit tests, and participated in daily standups and code reviews.", JSON.stringify(["React", "TypeScript", "Jest", "Git"]), ["Built 3 reusable React components adopted across the product dashboard.", "Fixed 15+ bugs and improved test coverage by 12% in the frontend codebase.", "Collaborated with a team of 5 engineers using Agile sprint cycles."]],
-    ["IT Support Intern", "City IT Services", "Summer 2024", "San Francisco, CA", "Provided technical support for 100+ employees, managed hardware inventory, and assisted with onboarding new workstations.", JSON.stringify(["Windows", "macOS", "Active Directory", "Ticketing Systems"]), ["Resolved 40+ support tickets weekly with a 95% satisfaction rating.", "Documented troubleshooting procedures in the internal knowledge base.", "Set up and configured 20+ employee workstations."]],
+    ["Basic Technical Support Intern", "Concentrix Corporation", "June 2025 - December 2025", "Davao City, Philippines", "Supported enterprise infrastructure and end users on an active BPO production floor, performing OS imaging, network cabling, IT asset auditing, and access control administration with a security-first approach to maintain high system availability and data integrity.", JSON.stringify(["Rufus", "Windows 10/11", "Cat5e/Cat6", "RJ-45", "MySQL", "Git", "Helpdesk Ticketing"]), ["Maintained 100+ production workstations across a 486-hour internship, executing scheduled hardware diagnostics and system maintenance to achieve 98% machine availability.", "Provisioned and standardized OS builds across 30+ desktop endpoints using bootable installation media (Rufus), reducing workstation imaging time from 45 to 25 minutes per unit.", "Fabricated, terminated, and tested Cat5e/Cat6 network patch cables using RJ-45 crimpers and continuity testers to maintain floor network connectivity and minimize workstation drops.", "Audited and logged an inventory of 150+ ICT peripheral assets, restoring 25 tested units to active deployment reserve to prevent replacement procurement costs."]],
   ];
 
   for (const [role, company, period, location, description, tech, achievements] of experiences) {
@@ -177,7 +173,7 @@ async function seedExperience(db: any) {
 
 async function seedEducation(db: any) {
   const education = [
-    ["Bachelor of Science in Computer Science", "State University", "2022 - 2026", "San Francisco, CA", "Focused on software engineering, web development, and database systems.", JSON.stringify(["JavaScript", "React", "Node.js", "PostgreSQL", "Git"]), ["Developed a full-stack capstone project: a student collaboration platform with 50+ active users.", "Completed coursework in Data Structures, Algorithms, Web Development, and Database Systems.", "Member of the university's ACM chapter and hackathon participant."]],
+    ["Bachelor of Science in Information Technology", "University of Southeastern Philippines - Obrero Campus", "2022 - 2026", "Davao City, Philippines", "Major in Information Security. Focused on information security, web application development, database administration, and ICT infrastructure. Dean's Lister (S.Y. 2023-2026).", JSON.stringify(["Laravel", "React", "NextJS", "MySQL", "Git", "GitHub"]), ["Dean's Lister (S.Y. 2023-2026)", "Designed and implemented StegoLock, a secure document storage platform using Laravel, MySQL, and React with zero-trust principles - awarded 3rd Place, Best Paper Presentation (IT-IS Cluster) at Research Colloquium 2026.", "Civil Service Examination (CSE) Professional Level Passer, August 2025"]],
   ];
 
   for (const [degree, institution, period, location, description, tech, achievements] of education) {

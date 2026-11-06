@@ -19,40 +19,41 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://alexmorgan.dev"),
-  title: "Alex Morgan — Senior Full-Stack Engineer & Product Builder",
+  metadataBase: new URL("https://linkedin.com/in/john-christian-pasaporte26"),
+  title: "John Christian Pasaporte — Information Security Specialist & Full-Stack Developer",
   description:
-    "Portfolio of Alex Morgan — Senior Full-Stack Engineer specializing in high-performance web applications, scalable architectures, and refined user experiences.",
+    "Portfolio of John Christian Pasaporte — BSIT graduate majoring in Information Security, skilled in ICT infrastructure, network administration, access control, and secure web application development (Laravel, React, NextJS).",
   keywords: [
-    "Full-Stack Developer",
-    "Next.js",
+    "Information Security",
+    "IT Support",
+    "Network Administration",
+    "Laravel",
     "React",
-    "TypeScript",
-    "Tailwind CSS",
+    "Next.js",
+    "MySQL",
+    "Full-Stack Developer",
     "Software Engineer",
-    "Frontend",
-    "Backend",
     "Portfolio",
   ],
   openGraph: {
-    title: "Alex Morgan — Senior Full-Stack Engineer & Product Builder",
+    title: "John Christian Pasaporte — Information Security Specialist & Full-Stack Developer",
     description:
-      "Portfolio of Alex Morgan — Senior Full-Stack Engineer specializing in high-performance web applications, scalable architectures, and refined user experiences.",
+      "Portfolio of John Christian Pasaporte — BSIT graduate majoring in Information Security, skilled in ICT infrastructure, network administration, access control, and secure web application development (Laravel, React, NextJS).",
     type: "website",
-    url: "https://alexmorgan.dev",
+    url: "https://linkedin.com/in/john-christian-pasaporte26",
     images: [
       {
         url: "/avatar.svg",
         width: 400,
         height: 400,
-        alt: "Alex Morgan avatar",
+        alt: "John Christian Pasaporte avatar",
         type: "image/svg+xml",
       },
     ],
-    siteName: "Alex Morgan Portfolio",
+    siteName: "John Christian Pasaporte Portfolio",
   },
   alternates: {
-    canonical: "https://alexmorgan.dev",
+    canonical: "https://linkedin.com/in/john-christian-pasaporte26",
   },
 };
 
