@@ -2,6 +2,11 @@
 import { NextResponse } from "next/server";
 import { getDb, initDb, saveDb, queryAll, queryOne, runStmt } from "@/lib/db";
 
+function serializeValue(v: any): any {
+  if (Array.isArray(v)) return JSON.stringify(v);
+  return v;
+}
+
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -24,7 +29,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const db = getDb();
     const body = await request.json();
     const setClause = Object.keys(body).map((k) => k + " = ?").join(", ");
-    const values = [...Object.values(body), id];
+    const values = [...Object.values(body).map(serializeValue), id];
     await runStmt(db, "UPDATE projects SET " + setClause + " WHERE id = ?", values);
     const updated = await queryOne(db, "SELECT * FROM projects WHERE id = ?", [id]);
     saveDb();

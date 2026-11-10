@@ -2,13 +2,25 @@
 import { NextResponse } from "next/server";
 import { getDb, initDb, saveDb, queryAll, queryOne, runStmt } from "@/lib/db";
 
+function safeJsonParse(value: any, fallback: any = []): any {
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value.split(",").map((s: string) => s.trim()).filter(Boolean);
+    }
+  }
+  return fallback;
+}
+
 export async function GET() {
   try {
     await initDb();
     const db = getDb();
     const rows = await queryAll(db, "SELECT * FROM experiences ORDER BY created_at DESC");
     for (const row of rows) {
-      row.tech = JSON.parse(row.tech || "[]");
+      row.tech = safeJsonParse(row.tech, []);
       row.achievements = (await queryAll(db, "SELECT achievement FROM experience_achievements WHERE experience_id = ? ORDER BY sort_order", [row.id])).map((a: any) => a.achievement);
     }
     return NextResponse.json(rows);

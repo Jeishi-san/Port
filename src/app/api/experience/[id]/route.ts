@@ -2,6 +2,18 @@
 import { NextResponse } from "next/server";
 import { getDb, initDb, saveDb, queryAll, queryOne, runStmt } from "@/lib/db";
 
+function safeJsonParse(value: any, fallback: any = []): any {
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value.split(",").map((s: string) => s.trim()).filter(Boolean);
+    }
+  }
+  return fallback;
+}
+
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -11,7 +23,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     if (!row) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
-    row.tech = JSON.parse(row.tech || "[]");
+    row.tech = safeJsonParse(row.tech, []);
     row.achievements = (await queryAll(db, "SELECT achievement FROM experience_achievements WHERE experience_id = ? ORDER BY sort_order", [id])).map((a: any) => a.achievement);
     return NextResponse.json(row);
   } catch (e: any) {

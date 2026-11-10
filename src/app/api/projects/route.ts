@@ -2,6 +2,11 @@
 import { NextResponse } from "next/server";
 import { getDb, initDb, saveDb, queryAll, queryOne, runStmt, lastInsertId } from "@/lib/db";
 
+function serializeValue(v: any): any {
+  if (Array.isArray(v)) return JSON.stringify(v);
+  return v;
+}
+
 export async function GET() {
   try {
     await initDb();
@@ -20,7 +25,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const columns = Object.keys(body).join(", ");
     const placeholders = Object.keys(body).map(() => "?").join(", ");
-    const values = Object.values(body);
+    const values = Object.values(body).map(serializeValue);
     const sql = "INSERT INTO projects (" + columns + ") VALUES (" + placeholders + ")";
     await runStmt(db, sql, values);
     const newId = await lastInsertId(db);
