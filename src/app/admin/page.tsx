@@ -134,6 +134,20 @@ function GraduationCapIcon({ className }: { className?: string }) {
   );
 }
 
+function parseJsonOrCsv(value: any): string[] {
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {
+      // fall through to csv split
+    }
+    return value.split(",").map((s: string) => s.trim()).filter(Boolean);
+  }
+  return [];
+}
+
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
@@ -275,20 +289,20 @@ export default function AdminPage() {
     setProjects(
       (projectsRaw as any[]).map((p) => ({
         ...p,
-        tags: typeof p.tags === "string" ? JSON.parse(p.tags || "[]") : p.tags,
+        tags: parseJsonOrCsv(p.tags),
       }))
     );
     setSkillCategories(skillsRaw);
     setExperiences(
       (experiencesRaw as any[]).map((e) => ({
         ...e,
-        tech: typeof e.tech === "string" ? JSON.parse(e.tech || "[]") : e.tech,
+        tech: parseJsonOrCsv(e.tech),
       }))
     );
     setEducation(
       (educationRaw as any[]).map((e) => ({
         ...e,
-        tech: typeof e.tech === "string" ? JSON.parse(e.tech || "[]") : e.tech,
+        tech: parseJsonOrCsv(e.tech),
       }))
     );
     setCertifications(certificationsRaw);
