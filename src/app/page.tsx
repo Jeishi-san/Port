@@ -11,6 +11,7 @@ import { SkillsSection } from "@/components/sections/SkillsSection";
 import { EducationSection } from "@/components/sections/EducationSection";
 import { ExperienceSection } from "@/components/sections/ExperienceSection";
 import { ContactSection } from "@/components/sections/ContactSection";
+import { CertificationsSection } from "@/components/sections/CertificationsSection";
 import { ProjectDetailModal } from "@/components/ui/ProjectDetailModal";
 
 export type Project = {
@@ -22,6 +23,7 @@ export type Project = {
   tags: string[];
   liveUrl: string;
   githubUrl: string;
+  screenshotUrl: string;
   featured: boolean;
 };
 
@@ -54,6 +56,17 @@ export type Education = {
   achievements: string[];
 };
 
+export type Certification = {
+  id: number;
+  name: string;
+  issuer: string;
+  dateEarned: string;
+  credentialId: string;
+  credentialUrl: string;
+  description: string;
+  category: string;
+};
+
 function parseJsonOrCsv(value: any): string[] {
   if (Array.isArray(value)) return value;
   if (typeof value === "string") {
@@ -79,6 +92,7 @@ export default function PortfolioPage() {
   const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [education, setEducation] = useState<Education[]>([]);
+  const [certifications, setCertifications] = useState<Certification[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -113,17 +127,19 @@ export default function PortfolioPage() {
 
   async function fetchData() {
     try {
-      const [pRes, sRes, eRes, eduRes, settingsRes] = await Promise.all([
+      const [pRes, sRes, eRes, eduRes, settingsRes, certRes] = await Promise.all([
         fetch("/api/projects"),
         fetch("/api/skills"),
         fetch("/api/experience"),
         fetch("/api/education"),
         fetch("/api/settings"),
+        fetch("/api/certifications"),
       ]);
       const projectsRaw = await pRes.json();
       const skillsRaw = await sRes.json();
       const experiencesRaw = await eRes.json();
       const educationRaw = await eduRes.json();
+      const certRaw = await certRes.json();
       const settingsRaw = await settingsRes.json();
 
       setProjects(
@@ -145,6 +161,7 @@ export default function PortfolioPage() {
           tech: parseJsonOrCsv(e.tech),
         }))
       );
+      setCertifications(certRaw as Certification[]);
       setAvatarUrl(settingsRaw?.avatar_url || "/avatar.svg");
     } catch (e) {
       console.error("Failed to fetch portfolio data", e);
@@ -212,6 +229,8 @@ export default function PortfolioPage() {
         <EducationSection education={education} />
 
         <ExperienceSection experiences={experiences} />
+
+        <CertificationsSection certifications={certifications} />
 
         <ContactSection
           emailAddress={emailAddress}

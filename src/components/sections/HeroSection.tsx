@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import React from "react";
-import { ChevronRight, Mail, Copy, Check, Download } from "lucide-react";
+import { ChevronRight, Mail, Copy, Check, Download, Shield, Briefcase, Code2, GraduationCap } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatCard } from "@/components/ui/StatCard";
@@ -16,13 +16,22 @@ interface HeroSectionProps {
   handleCopyEmail: () => void;
 }
 
+const ICONS: Record<string, React.ElementType> = {
+  Shield,
+  Briefcase,
+  Code2,
+  GraduationCap,
+};
+
 export function HeroSection({ projects, education, experiences, copied, handleCopyEmail }: HeroSectionProps) {
   const emailAddress = "pasaportejohnchristian@gmail.com";
 
-  const githubContributions = projects.reduce(
-    (acc, p) => acc + (parseInt(p.metrics.match(/\\d+/)?.[0] || "0") || 0),
-    0
-  );
+  const statCards = [
+    { value: "BSIT InfoSec", label: "Degree", icon: "GraduationCap" },
+    { value: "486 hrs", label: "Internship", icon: "Briefcase" },
+    { value: "3rd Place", label: "Best Paper", icon: "Shield" },
+    { value: "CSE Prof.", label: "Passer", icon: "Code2" },
+  ];
 
   return (
     <section id="about" className="pt-16 pb-20 md:pt-24 md:pb-28 scroll-mt-[80px]">
@@ -32,19 +41,18 @@ export function HeroSection({ projects, education, experiences, copied, handleCo
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
           </span>
-          <span>Available for entry-level & internship opportunities</span>
+          <span>BS Information Technology • Major in Information Security</span>
         </div>
 
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl text-gradient">
-          Building things that matter, one line of code at a time.
+          Securing systems. Building resilient software.
         </h1>
 
         <p className="text-xl text-muted-foreground sm:text-2xl leading-relaxed">
           I&apos;m <span className="font-semibold text-foreground">John Christian Pasaporte</span>, a BSIT
-          graduate majoring in Information Security with hands-on experience supporting enterprise
-          infrastructure and end users. I combine practical technical troubleshooting with a security-first
-          approach to maintain high system availability and ensure data integrity across organizational
-          workflows.
+          graduate majoring in Information Security. I combine hands-on enterprise infrastructure support
+          with a security-first approach to maintain high system availability and ensure data integrity
+          across organizational workflows.
         </p>
 
         <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -77,10 +85,12 @@ export function HeroSection({ projects, education, experiences, copied, handleCo
         </div>
 
         <div className="grid grid-cols-2 gap-4 pt-8 sm:grid-cols-4 w-full border-t border-border/60 mt-4">
-          <StatCard value={projects.length} label="Projects Built" />
-          <StatCard value={education.length} label="Degree Earned" />
-          <StatCard value={experiences.length} label="Internships" />
-          <StatCard value={`${githubContributions}+`} label="GitHub Contributions" />
+          {statCards.map((stat, i) => {
+            const Icon = ICONS[stat.icon] || Code2;
+            return (
+              <StatCard key={i} value={stat.value} label={stat.label} icon={Icon} />
+            );
+          })}
         </div>
       </div>
     </section>

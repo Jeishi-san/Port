@@ -28,6 +28,7 @@ import {
   List,
   Shield,
   Rocket,
+  Award,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -43,6 +44,7 @@ type Project = {
   tags: string[];
   liveUrl: string;
   githubUrl: string;
+  screenshotUrl: string;
   featured: boolean;
 };
 
@@ -75,7 +77,7 @@ type Education = {
   achievements: string[];
 };
 
-type Tab = "projects" | "skills" | "experience" | "education";
+type Tab = "projects" | "skills" | "experience" | "education" | "certifications";
 
 type Toast = {
   id: string;
@@ -88,6 +90,7 @@ const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
   { id: "skills", label: "Skills", icon: Code },
   { id: "experience", label: "Experience", icon: BriefcaseIcon },
   { id: "education", label: "Education", icon: GraduationCapIcon },
+  { id: "certifications", label: "Certifications", icon: Award },
 ];
 
 function BriefcaseIcon({ className }: { className?: string }) {
@@ -147,7 +150,7 @@ export default function AdminPage() {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [newProject, setNewProject] = useState({
     title: "", category: "", description: "", metrics: "",
-    tags: "", liveUrl: "", githubUrl: "", featured: false,
+    tags: "", liveUrl: "", githubUrl: "", screenshotUrl: "", featured: false,
   });
   const [projectFormOpen, setProjectFormOpen] = useState(false);
 
@@ -171,9 +174,16 @@ export default function AdminPage() {
   });
   const [eduFormOpen, setEduFormOpen] = useState(false);
 
+  const [certifications, setCertifications] = useState<any[]>([]);
+  const [editingCertification, setEditingCertification] = useState<any | null>(null);
+  const [newCertification, setNewCertification] = useState({
+    name: "", issuer: "", dateEarned: "", credentialId: "", credentialUrl: "", description: "", category: "",
+  });
+  const [certFormOpen, setCertFormOpen] = useState(false);
+
   const [confirmDelete, setConfirmDelete] = useState<{
     id: number;
-    type: "project" | "skill" | "category" | "experience" | "education";
+    type: "project" | "skill" | "category" | "experience" | "education" | "certification";
     catId?: number;
   } | null>(null);
 
@@ -247,18 +257,20 @@ export default function AdminPage() {
   };
 
   async function fetchAll() {
-    const [pRes, sRes, eRes, eduRes, settingsRes] = await Promise.all([
+    const [pRes, sRes, eRes, eduRes, settingsRes, certRes] = await Promise.all([
       fetch("/api/projects"),
       fetch("/api/skills"),
       fetch("/api/experience"),
       fetch("/api/education"),
       fetch("/api/settings"),
+      fetch("/api/certifications"),
     ]);
     const projectsRaw = await pRes.json();
     const skillsRaw = await sRes.json();
     const experiencesRaw = await eRes.json();
     const educationRaw = await eduRes.json();
     const settingsRaw = await settingsRes.json();
+    const certificationsRaw = await certRes.json();
 
     setProjects(
       (projectsRaw as any[]).map((p) => ({
@@ -279,6 +291,7 @@ export default function AdminPage() {
         tech: typeof e.tech === "string" ? JSON.parse(e.tech || "[]") : e.tech,
       }))
     );
+    setCertifications(certificationsRaw);
     setAvatarUrl(settingsRaw?.avatar_url || "/avatar.svg");
   }
 
@@ -356,6 +369,7 @@ export default function AdminPage() {
       tags: newProject.tags.split(",").map((t: string) => t.trim()).filter(Boolean),
       liveUrl: newProject.liveUrl,
       githubUrl: newProject.githubUrl,
+      screenshotUrl: newProject.screenshotUrl,
       featured: newProject.featured ? 1 : 0,
     };
     const key = editingProject ? `project-${editingProject.id}` : "project-new";
@@ -397,12 +411,12 @@ export default function AdminPage() {
   }
 
   function resetNewProject() {
-    setNewProject({ title: "", category: "", description: "", metrics: "", tags: "", liveUrl: "", githubUrl: "", featured: false });
+    setNewProject({ title: "", category: "", description: "", metrics: "", tags: "", liveUrl: "", githubUrl: "", screenshotUrl: "", featured: false });
   }
 
   function startEditProject(p: Project) {
     setEditingProject(p);
-    setNewProject({ ...p, tags: p.tags.join(", "), featured: Boolean(p.featured) });
+    setNewProject({ ...p, tags: p.tags.join(", "), screenshotUrl: p.screenshotUrl || "", featured: Boolean(p.featured) });
     setProjectFormOpen(true);
   }
 
@@ -605,6 +619,53 @@ export default function AdminPage() {
     setEduFormOpen(true);
   }
 
+  async function saveCertification() {
+    const key = editingCertification ? `certification-${editingCertification.id}` : "certification-new";
+    setLoadingKey(key, true);
+    try {
+      if (editingCertification) {
+        const res = await fetch("/api/certifications/" + editingCertification.id, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + password },
+          body: JSON.stringify(newCertification),
+        });
+        const updated = await res.json();
+        setCertifications(certifications.map((c) => (c.id === editingCertification!.id ? updated : c)));
+        addToast("success", `Certification "${updated.name}" updated`);
+      } else {
+        const res = await fetch("/api/certifications", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + password },
+          body: JSON.stringify(newCertification),
+        });
+        const created = await res.json();
+        setCertifications([created, ...certifications]);
+        addToast("success", `Certification "${created.name}" created`);
+      }
+      setEditingCertification(null);
+      resetNewCertification();
+      setCertFormOpen(false);
+    } catch {
+      addToast("error", "Failed to save certification");
+    } finally {
+      setLoadingKey(key, false);
+    }
+  }
+
+  async function deleteCertification(id: number) {
+    setConfirmDelete({ id, type: "certification" });
+  }
+
+  function resetNewCertification() {
+    setNewCertification({ name: "", issuer: "", dateEarned: "", credentialId: "", credentialUrl: "", description: "", category: "" });
+  }
+
+  function startEditCertification(c: any) {
+    setEditingCertification(c);
+    setNewCertification({ ...c });
+    setCertFormOpen(true);
+  }
+
   async function handleConfirmDelete() {
     if (!confirmDelete) return;
     const { id, type, catId } = confirmDelete;
@@ -647,6 +708,11 @@ export default function AdminPage() {
           await fetch("/api/education/" + id, { method: "DELETE", headers: { "Authorization": "Bearer " + password } });
           setEducation(education.filter((e) => e.id !== id));
           addToast("success", "Education deleted");
+          break;
+        case "certification":
+          await fetch("/api/certifications/" + id, { method: "DELETE", headers: { "Authorization": "Bearer " + password } });
+          setCertifications(certifications.filter((c) => c.id !== id));
+          addToast("success", "Certification deleted");
           break;
       }
     } catch {
@@ -967,6 +1033,24 @@ export default function AdminPage() {
             isLoading={isLoading}
           />
         )}
+        {activeTab === "certifications" && (
+          <CertificationsView
+            certifications={certifications}
+            setCertifications={setCertifications}
+            editingCertification={editingCertification}
+            setEditingCertification={setEditingCertification}
+            newCertification={newCertification}
+            setNewCertification={setNewCertification}
+            certFormOpen={certFormOpen}
+            setCertFormOpen={setCertFormOpen}
+            password={password}
+            saveCertification={saveCertification}
+            deleteCertification={deleteCertification}
+            startEditCertification={startEditCertification}
+            resetNewCertification={resetNewCertification}
+            isLoading={isLoading}
+          />
+        )}
       </main>
       </div>
 
@@ -1186,6 +1270,15 @@ function ProjectsView(props: ProjectsViewProps) {
                   onChange={(e) => setNewProject({ ...newProject, githubUrl: e.target.value })}
                   className={inputBase}
                   placeholder="https://github.com/user/repo"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className={labelBase}>Screenshot URL</label>
+                <input
+                  value={newProject.screenshotUrl}
+                  onChange={(e) => setNewProject({ ...newProject, screenshotUrl: e.target.value })}
+                  className={inputBase}
+                  placeholder="/projects/stegolock.png"
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -1765,3 +1858,186 @@ function EducationView(props: EducationViewProps) {
 
 
 
+
+type CertificationsViewProps = {
+  certifications: any[];
+  setCertifications: any;
+  editingCertification: any;
+  setEditingCertification: any;
+  newCertification: any;
+  setNewCertification: any;
+  certFormOpen: boolean;
+  setCertFormOpen: any;
+  password: string;
+  saveCertification: any;
+  deleteCertification: any;
+  startEditCertification: any;
+  resetNewCertification: any;
+  isLoading: (key: string) => boolean;
+};
+function CertificationsView(props: CertificationsViewProps) {
+  const {
+    certifications,
+    setCertifications,
+    editingCertification,
+    setEditingCertification,
+    newCertification,
+    setNewCertification,
+    certFormOpen,
+    setCertFormOpen,
+    password,
+    saveCertification,
+    deleteCertification,
+    startEditCertification,
+    resetNewCertification,
+    isLoading,
+  } = props;
+
+  return (
+    <div className="grid lg:grid-cols-12 gap-6">
+      <div className="lg:col-span-7 space-y-3">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2">
+              <Award className="size-4" /> Certifications ({certifications.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="space-y-3">
+              {certifications.map((c) => (
+                <div key={c.id} className="p-3 rounded-lg border border-border/50 hover:bg-muted/40 transition-colors group">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="font-medium text-foreground">{c.name}</div>
+                    <Badge variant="secondary" className="text-xs px-2">{c.category}</Badge>
+                  </div>
+                  <div className="text-sm text-primary/70">{c.issuer}</div>
+                  {c.dateEarned && (
+                    <div className="text-xs text-muted-foreground mt-0.5">Earned {c.dateEarned}</div>
+                  )}
+                  {c.credentialId && (
+                    <div className="text-xs text-muted-foreground mt-0.5">ID: {c.credentialId}</div>
+                  )}
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{c.description}</p>
+                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => startEditCertification(c)}
+                      className="p-1 opacity-70 group-hover:opacity-100"
+                      disabled={isLoading(`certification-${c.id}`)}
+                    >
+                      <Edit3 className="size-3.5" />
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => deleteCertification(c.id)}
+                      className="p-1 opacity-70 group-hover:opacity-100"
+                      disabled={isLoading(`certification-${c.id}`)}
+                    >
+                      <Trash2 className="size-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              {certifications.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <Award className="size-8 text-muted-foreground/50 mb-3" />
+                  <p className="text-sm text-muted-foreground">No certifications yet. Add one below.</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="lg:col-span-5">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Plus className="size-4" /> {editingCertification ? "Edit Certification" : "Add Certification"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={(e) => { e.preventDefault(); saveCertification(); }} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className={labelBase}>Name</label>
+                  <input
+                    value={newCertification.name}
+                    onChange={(e) => setNewCertification({ ...newCertification, name: e.target.value })}
+                    className={inputBase}
+                    placeholder="e.g. CSE Professional Level"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className={labelBase}>Issuer</label>
+                  <input
+                    value={newCertification.issuer}
+                    onChange={(e) => setNewCertification({ ...newCertification, issuer: e.target.value })}
+                    className={inputBase}
+                    placeholder="e.g. Civil Service Commission"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className={labelBase}>Date Earned</label>
+                  <input
+                    value={newCertification.dateEarned}
+                    onChange={(e) => setNewCertification({ ...newCertification, dateEarned: e.target.value })}
+                    className={inputBase}
+                    placeholder="e.g. August 2025"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className={labelBase}>Category</label>
+                  <input
+                    value={newCertification.category}
+                    onChange={(e) => setNewCertification({ ...newCertification, category: e.target.value })}
+                    className={inputBase}
+                    placeholder="e.g. Security, Government, Database"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className={labelBase}>Credential ID</label>
+                <input
+                  value={newCertification.credentialId}
+                  onChange={(e) => setNewCertification({ ...newCertification, credentialId: e.target.value })}
+                  className={inputBase}
+                  placeholder="e.g. CSE-P-2025-08"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className={labelBase}>Credential URL</label>
+                <input
+                  value={newCertification.credentialUrl}
+                  onChange={(e) => setNewCertification({ ...newCertification, credentialUrl: e.target.value })}
+                  className={inputBase}
+                  placeholder="https://verify.example.com/cred/123"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className={labelBase}>Description</label>
+                <textarea
+                  value={newCertification.description}
+                  onChange={(e) => setNewCertification({ ...newCertification, description: e.target.value })}
+                  rows={3}
+                  className={inputBase + " resize-y"}
+                  placeholder="Describe the certification…"
+                />
+              </div>
+              <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={isLoading("certification-new") || isLoading(`certification-${editingCertification?.id}`)}>
+                {editingCertification ? "Update Certification" : "Create Certification"}
+              </Button>
+              {editingCertification && (
+                <Button type="button" variant="outline" onClick={() => { setEditingCertification(null); resetNewCertification(); setCertFormOpen(false); }} className="w-full">
+                  Cancel
+                </Button>
+              )}
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

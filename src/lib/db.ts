@@ -25,6 +25,7 @@ export async function initDb(): Promise<void> {
         tags TEXT,
         live_url TEXT,
         github_url TEXT,
+        screenshot_url TEXT,
         featured INTEGER DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );`);
@@ -82,6 +83,17 @@ export async function initDb(): Promise<void> {
         avatar_url TEXT DEFAULT "/avatar.svg",
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );`);
+    await client.execute(`CREATE TABLE IF NOT EXISTS certifications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        issuer TEXT NOT NULL,
+        date_earned TEXT,
+        credential_id TEXT,
+        credential_url TEXT,
+        description TEXT,
+        category TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );`);
 
     const projectCount = (await queryOne(client, "SELECT COUNT(*) as count FROM projects"))?.count;
     if (projectCount === 0) { await seedProjects(client); }
@@ -93,6 +105,8 @@ export async function initDb(): Promise<void> {
     if (eduCount === 0) { await seedEducation(client); }
     const settingsCount = (await queryOne(client, "SELECT COUNT(*) as count FROM portfolio_settings"))?.count;
     if (settingsCount === 0) { await seedSettings(client); }
+    const certCount = (await queryOne(client, "SELECT COUNT(*) as count FROM certifications"))?.count;
+    if (certCount === 0) { await seedCertifications(client); }
   })();
 
   return initPromise;
@@ -131,12 +145,12 @@ export async function lastInsertId(db: any): Promise<number> {
 
 async function seedProjects(db: any) {
   const projects = [
-    ["StegoLock", "Full Stack", "Secure digital document storage platform built with Laravel (PHP), MySQL, and React, incorporating zero-trust and Reconstruction-Dependent Security Model (RDSM) principles. Features access-controlled RESTful API endpoints and structured database schemas for document partitioning, verification, and protected storage.", "3rd Place Best Paper", JSON.stringify(["Laravel", "MySQL", "React", "Zero-Trust", "PHP", "REST API"]), "", "", 1],
-    ["Queuing Management System", "Full Stack", "Full-stack digital queuing system to automate customer intake workflows, track service timestamps, and reduce physical counter congestion. Engineered MySQL database schemas to record agent status, transaction durations, and queue performance metrics.", "2024", JSON.stringify(["MySQL", "Full-Stack", "PHP", "Queue Management"]), "", "", 0],
+    ["StegoLock", "Full Stack", "Secure digital document storage platform built with Laravel (PHP), MySQL, and React, incorporating zero-trust and Reconstruction-Dependent Security Model (RDSM) principles. Features access-controlled RESTful API endpoints and structured database schemas for document partitioning, verification, and protected storage.", "3rd Place Best Paper", JSON.stringify(["Laravel", "MySQL", "React", "Zero-Trust", "PHP", "REST API"]), "", "", "/projects/stegolock.png", 1],
+    ["Queuing Management System", "Full Stack", "Full-stack digital queuing system to automate customer intake workflows, track service timestamps, and reduce physical counter congestion. Engineered MySQL database schemas to record agent status, transaction durations, and queue performance metrics.", "2024", JSON.stringify(["MySQL", "Full-Stack", "PHP", "Queue Management"]), "", "", "/projects/queuing.png", 0],
   ];
 
   for (const p of projects) {
-    await runStmt(db, `INSERT INTO projects (title, category, description, metrics, tags, live_url, github_url, featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, p);
+    await runStmt(db, `INSERT INTO projects (title, category, description, metrics, tags, live_url, github_url, screenshot_url, featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, p);
   }
 }
 
@@ -187,4 +201,16 @@ async function seedEducation(db: any) {
 
 async function seedSettings(db: any) {
   await runStmt(db, "INSERT INTO portfolio_settings (id, avatar_url) VALUES (1, '/avatar.svg')");
+}
+
+async function seedCertifications(db: any) {
+  const certifications = [
+    ["Civil Service Examination (CSE) - Professional Level", "Civil Service Commission (Philippines)", "August 2025", "CSE-P-2025-08", "", "Passed the CSE Professional Level eligibility examination", "Government"],
+    ["Information Security Fundamentals", "Self-Study / Coursework", "2024", "", "", "Covered CIA triad, risk management, cryptography basics, and network security principles", "Security"],
+    ["Database Administration (MySQL)", "University Coursework", "2025", "", "", "Relational database design, SQL querying, normalization, and MySQL administration", "Database"],
+  ];
+
+  for (const c of certifications) {
+    await runStmt(db, `INSERT INTO certifications (name, issuer, date_earned, credential_id, credential_url, description, category) VALUES (?, ?, ?, ?, ?, ?, ?)`, c);
+  }
 }

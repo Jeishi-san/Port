@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import React from "react";
+import Image from "next/image";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { GithubIcon } from "@/components/icons";
@@ -25,8 +26,20 @@ export const ProjectCard = React.memo(({ project, onClick }: ProjectCardProps) =
           onClick(project);
         }
       }}
-      className="flex flex-col justify-between border-border/70 hover:border-primary hover:bg-card/80 transition-all duration-200 hover:shadow-md bg-card/60 backdrop-blur-xs group cursor-pointer"
+      className="flex flex-col justify-between border-border/70 hover:border-primary hover:bg-card/80 transition-all duration-200 hover:shadow-md bg-card/60 backdrop-blur-xs group cursor-pointer overflow-hidden"
     >
+      {project.screenshotUrl && (
+        <div className="relative h-32 md:h-40 overflow-hidden bg-muted border-b border-border/50">
+          <Image
+            src={project.screenshotUrl}
+            alt={`${project.title} screenshot`}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+          />
+        </div>
+      )}
       <div>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between gap-2 mb-2">

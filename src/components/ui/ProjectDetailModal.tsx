@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import React from "react";
+import Image from "next/image";
 import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Project } from "@/app/page";
@@ -21,7 +22,7 @@ export function ProjectDetailModal({ project, isOpen, onClose }: ProjectDetailMo
       aria-hidden="true"
     >
       <div
-        className="bg-card border border-border/80 rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-2xl animate-in fade-in zoom-in duration-200"
+        className="bg-card border border-border/80 rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-3xl animate-in fade-in zoom-in duration-200"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -46,6 +47,19 @@ export function ProjectDetailModal({ project, isOpen, onClose }: ProjectDetailMo
             <X className="size-5" />
           </button>
         </div>
+
+        {project.screenshotUrl && (
+          <div className="relative h-48 md:h-64 overflow-hidden rounded-xl border border-border bg-muted mb-6">
+            <Image
+              src={project.screenshotUrl}
+              alt={`${project.title} screenshot`}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover"
+              loading="lazy"
+            />
+          </div>
+        )}
 
         <h2 id="project-detail-title" className="text-2xl font-bold tracking-tight text-foreground mb-2">
           {project.title}
